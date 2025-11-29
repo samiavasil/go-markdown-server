@@ -1,0 +1,25 @@
+FROM golang:1.21-alpine
+
+# Accept proxy settings as build arguments
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+
+# Set proxy environment variables
+ENV HTTP_PROXY=${HTTP_PROXY}
+ENV HTTPS_PROXY=${HTTPS_PROXY}
+ENV http_proxy=${HTTP_PROXY}
+ENV https_proxy=${HTTPS_PROXY}
+
+RUN echo "=== Environment variables ==="
+RUN env | grep -i proxy || echo "NO PROXY VARS FOUND"
+
+RUN echo "=== Testing curl to proxy ==="
+RUN apk add --no-cache curl
+RUN curl -v --proxy http://10.40.108.152:3129 http://www.google.com 2>&1 | head -20
+
+RUN echo "=== Testing curl with env proxy ==="
+RUN curl -v http://www.google.com 2>&1 | head -20
+
+RUN echo "=== Netstat ==="
+RUN apk add --no-cache netstat-nat
+RUN netstat -rn

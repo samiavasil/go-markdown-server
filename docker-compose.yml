@@ -3,14 +3,31 @@ services:
   web:
     container_name: go-markdown-server
     build: .
+    image: go-markdown-server:latest
     ports:
       - "8080:8080"
     environment:
       PORT: 8080
+      PLANTUML_SERVER: http://plantuml:8080
+      PLANTUML_PUBLIC_URL: /plantuml
+      SYNC_DIR: /app/content
+      AUTO_SYNC: "true"
+      NO_PROXY: plantuml,mongo,localhost,127.0.0.1
+      no_proxy: plantuml,mongo,localhost,127.0.0.1
+    volumes:
+      - ./md.html:/app/md.html:ro
+      - ./content.html:/app/content.html:ro
+      - ./content:/app/content:ro
     links:
-      - mongo 
+      - mongo
+      - plantuml
   mongo:
     container_name: mongo
     image: mongo
     ports: 
       - "27017:27017"
+  plantuml:
+    container_name: plantuml
+    image: plantuml/plantuml-server:jetty
+    ports:
+      - "8081:8080"

@@ -1,0 +1,13 @@
+# Simple Dockerfile that uses pre-built binary
+FROM alpine:latest
+
+WORKDIR /app
+
+# Copy pre-built binary and template
+COPY goapp .
+COPY md.html .
+
+# Make binary executable
+RUN chmod +x goapp
+
+ENTRYPOINT ["./goapp"]

@@ -1,0 +1,40 @@
+FROM golang:1.21-alpine
+
+# Accept proxy settings as build arguments
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+
+# Set proxy environment variables
+ENV HTTP_PROXY=${HTTP_PROXY}
+ENV HTTPS_PROXY=${HTTPS_PROXY}
+ENV http_proxy=${HTTP_PROXY}
+ENV https_proxy=${HTTPS_PROXY}
+
+RUN echo "=== Environment variables ==="
+RUN env | grep -i proxy
+
+RUN echo "=== Installing git and ca-certificates ==="
+RUN apk add --no-cache git ca-certificates
+
+# Copy corporate CA certificates from build context
+COPY certs/*.crt /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
+# Set SSL cert location for Go
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+
+# Configure git to use proxy and disable SSL verification
+RUN git config --global http.proxy ${HTTP_PROXY} && \
+    git config --global https.proxy ${HTTPS_PROXY} && \
+    git config --global http.sslVerify false
+
+WORKDIR /src
+
+# Copy go.mod and go.sum 
+COPY go.mod go.sum ./
+
+RUN echo "=== Testing go env ==="
+RUN go env | grep -i proxy
+
+RUN echo "=== go mod download with verbose ==="
+RUN go mod download -x 2>&1 | head -100
