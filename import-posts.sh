@@ -1,49 +1,66 @@
 #!/bin/bash
 
-# Import markdown files to go-markdown-server
-# Usage: ./import-posts.sh <directory-with-md-files>
+# Import markdown files to go-markdown-server using modern API
+# Usage: ./import-posts.sh <directory-with-md-files> [collection-name]
 
 SERVER_URL="http://localhost:8080"
-API_KEY="124252"
 MD_DIR="${1:-.}"
+COLLECTION_NAME="${2}"
 
 if [ ! -d "$MD_DIR" ]; then
     echo "Error: Directory $MD_DIR does not exist"
     exit 1
 fi
 
-echo "Importing markdown files from: $MD_DIR"
-echo "========================================="
+# Auto-detect collection name from directory if not provided
+if [ -z "$COLLECTION_NAME" ]; then
+    COLLECTION_NAME=$(basename "$MD_DIR")
+fi
 
-# Find all .md files
-find "$MD_DIR" -name "*.md" -type f | while read -r file; do
-    # Extract filename without extension for URL
-    filename=$(basename "$file" .md)
-    
-    # Create URL-friendly slug
-    url=$(echo "$filename" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')
-    
-    # Use filename as title (replace dashes/underscores with spaces)
-    title=$(echo "$filename" | tr '_-' ' ')
-    
-    # Read file content and URL encode
-    body=$(python3 -c "import urllib.parse; import sys; print(urllib.parse.quote(sys.stdin.read()))" < "$file")
-    
-    echo -n "Importing: $title ($url) ... "
-    
-    # Send to server
-    response=$(curl -s "${SERVER_URL}/add?title=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$title'))")&url=${url}&body=${body}&key=${API_KEY}")
-    
-    if [ "$response" = "success" ]; then
-        echo "✓ Success"
-    else
-        echo "✗ Failed: $response"
-    fi
-    
-    # Small delay to avoid overwhelming the server
-    sleep 0.1
-done
+echo "======================================"
+echo "📥 IMPORTING MARKDOWN FILES"
+echo "======================================"
+echo "Source directory: $MD_DIR"
+echo "Collection name: $COLLECTION_NAME"
+echo ""
 
-echo "========================================="
-echo "Import complete!"
-echo "View posts at: ${SERVER_URL}/"
+# Count markdown files
+file_count=$(find "$MD_DIR" -name "*.md" -type f | wc -l)
+echo "Found $file_count markdown file(s)"
+echo ""
+
+if [ "$file_count" -eq 0 ]; then
+    echo "No markdown files found in $MD_DIR"
+    exit 1
+fi
+
+# Build curl command with all files
+echo "Uploading files to collection '$COLLECTION_NAME'..."
+curl_cmd="curl -s -X POST \"${SERVER_URL}/api/collection/create\" -F \"name=${COLLECTION_NAME}\""
+
+# Add each markdown file
+while IFS= read -r file; do
+    curl_cmd="$curl_cmd -F \"files=@$file\""
+done < <(find "$MD_DIR" -name "*.md" -type f)
+
+# Execute the curl command
+response=$(eval $curl_cmd)
+
+# Check response
+if echo "$response" | grep -q "\"status\":\"success\""; then
+    echo ""
+    echo "======================================"
+    echo "✅ IMPORT COMPLETE!"
+    echo "======================================"
+    echo "Collection: $COLLECTION_NAME"
+    echo "Files imported: $file_count"
+    echo ""
+    echo "🌐 View at: ${SERVER_URL}/collection/$COLLECTION_NAME"
+else
+    echo ""
+    echo "======================================"
+    echo "❌ IMPORT FAILED"
+    echo "======================================"
+    echo "Response: $response"
+    exit 1
+fi
