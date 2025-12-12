@@ -18,14 +18,20 @@ RUN apk add --no-cache git ca-certificates
 
 WORKDIR /src
 
-# Copy all source files (including go.mod, go.sum, and vendor directory)
+# Copy go mod files first for better caching
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
 COPY . .
 
-# Build the application using vendored dependencies
-RUN CGO_ENABLED=0 go build -mod=vendor -o goapp
+# Build the application
+RUN CGO_ENABLED=0 go build -o goapp
 
 # final stage
 FROM alpine:latest
 WORKDIR /app
 COPY --from=build-env /src/goapp .
+COPY --from=build-env /src/md.html .
+COPY --from=build-env /src/content.html* ./
 ENTRYPOINT ["./goapp"]
