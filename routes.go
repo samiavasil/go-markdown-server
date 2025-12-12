@@ -37,12 +37,14 @@ func mdNamedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Process PlantUML blocks and convert cross-references
-	// Skip PlantUML for uploaded collections (they don't have file structure on disk)
 	processedBody := post.Body
+	// For uploaded collections, use empty baseDir (inline blocks work, .puml files won't be found)
+	// For content/ collections, use actual baseDir for .puml file resolution
+	baseDir := ""
 	if !strings.HasPrefix(post.Collection, "uploaded/") {
-		baseDir := strings.TrimPrefix(post.Collection, "content/")
-		processedBody = plantuml.ProcessPlantUMLWithBase(processedBody, baseDir)
+		baseDir = strings.TrimPrefix(post.Collection, "content/")
 	}
+	processedBody = plantuml.ProcessPlantUMLWithBase(processedBody, baseDir)
 	processedBody = processCrossReferences(processedBody, post.Collection)
 	
 	// Use content.html (only content, no sidebar) for iframe display
@@ -110,11 +112,11 @@ func collectionContentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Process PlantUML and cross-references (base = collection name without prefix)
-	// Skip PlantUML for uploaded collections (they don't have file structure on disk)
+	baseDir := ""
 	if !strings.HasPrefix(collectionName, "uploaded/") {
-		baseDir := strings.TrimPrefix(collectionName, "content/")
-		out = plantuml.ProcessPlantUMLWithBase(out, baseDir)
+		baseDir = strings.TrimPrefix(collectionName, "content/")
 	}
+	out = plantuml.ProcessPlantUMLWithBase(out, baseDir)
 	out = processCrossReferences(out, collectionName)
 	
 	tmpl := template.Must(template.ParseFiles("content.html"))

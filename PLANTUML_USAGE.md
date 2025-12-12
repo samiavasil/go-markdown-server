@@ -1,33 +1,33 @@
-# PlantUML интеграция в go-markdown-server
+# PlantUML Integration in go-markdown-server
 
-## Какво е добавено
+## Overview
 
-Проектът вече поддържа рендериране на PlantUML диаграми директно в Markdown постовете.
+This project now supports rendering PlantUML diagrams directly in Markdown posts.
 
-## Как работи
+## How It Works
 
-1. **PlantUML Server** - Docker контейнер с PlantUML сървър (`plantuml/plantuml-server:jetty`)
-2. **PlantUML модул** - Go код който намира PlantUML блокове в Markdown и ги заменя с изображения
-3. **Автоматична обработка** - Всички постове се обработват преди да се покажат
+1. **PlantUML Server** - Docker container with PlantUML server (`plantuml/plantuml-server:jetty`)
+2. **PlantUML Module** - Go code that finds PlantUML blocks in Markdown and replaces them with images
+3. **Automatic Processing** - All posts are processed before being displayed
 
-## Използване
+## Usage
 
-### Вграждане на PlantUML диаграми
+### Embedding PlantUML Diagrams
 
-В Markdown текста използвайте синтаксиса:
+In your Markdown text, use the syntax:
 
-\`\`\`plantuml
+```plantuml
 Alice -> Bob: Hello
 Bob -> Alice: Hi there!
-\`\`\`
+```
 
-Това автоматично ще се рендерира като изображение на диаграмата.
+This will automatically render as a diagram image.
 
-### Примери
+### Examples
 
 #### 1. Sequence Diagram
 
-\`\`\`plantuml
+```plantuml
 @startuml
 actor User
 participant "Web Browser" as Browser
@@ -44,11 +44,11 @@ PlantUML -> Server: Return PNG diagram
 Server -> Browser: HTML with embedded diagram
 Browser -> User: Display rendered post
 @enduml
-\`\`\`
+```
 
 #### 2. Class Diagram
 
-\`\`\`plantuml
+```plantuml
 @startuml
 class Post {
   +string Title
@@ -71,11 +71,11 @@ class Router {
 Router --> Database : uses
 Database --> Post : manages
 @enduml
-\`\`\`
+```
 
 #### 3. Component Diagram
 
-\`\`\`plantuml
+```plantuml
 @startuml
 package "Docker Compose" {
   [go-markdown-server] as Web
@@ -89,115 +89,168 @@ Web --> UML : renders diagrams
 actor User
 User --> Web : HTTP requests
 @enduml
-\`\`\`
+```
 
 #### 4. Activity Diagram
 
-\`\`\`plantuml
+```plantuml
 @startuml
 start
 :User writes Markdown post;
 :Includes PlantUML code block;
-:Saves to database;
-:User requests post;
-:Server fetches from DB;
-:Server finds PlantUML blocks;
-if (PlantUML block found?) then (yes)
+:Submit post to server;
+if (Contains PlantUML?) then (yes)
+  :Extract PlantUML code;
   :Send to PlantUML server;
-  :Receive PNG image;
-  :Replace block with image URL;
+  :Receive diagram image;
+  :Replace code with image URL;
 else (no)
-  :Keep original Markdown;
+  :Keep as regular markdown;
 endif
-:Convert Markdown to HTML;
-:Return to user;
+:Store in MongoDB;
+:Display post with diagram;
 stop
 @enduml
-\`\`\`
+```
 
-## Стартиране
+## External .puml Files
 
-### С Docker Compose (препоръчително)
+You can also reference external PlantUML files:
 
-\`\`\`bash
-cd /home/vav3sf/Projects/samiavasil/go-markdown-server
-docker-compose up -d
-\`\`\`
+```markdown
+![Architecture Diagram](Doc/diagrams/services-architecture.puml)
+```
 
-Това ще стартира:
-- Go сървър на http://localhost:8080
-- MongoDB на localhost:27017
-- PlantUML Server на http://localhost:8081
+The server will:
+1. Load the `.puml` file from the filesystem
+2. Send it to the PlantUML server for rendering
+3. Return the generated diagram image
+4. Display it inline in your document
 
-### Добавяне на пост с PlantUML
+## Configuration
 
-\`\`\`bash
-curl -X GET "http://localhost:8080/add?title=PlantUML%20Demo&url=plantuml-demo&body=Check%20out%20this%20diagram%3A%0A%0A%60%60%60plantuml%0AAlice%20-%3E%20Bob%3A%20Hello%0ABob%20-%3E%20Alice%3A%20Hi%21%0A%60%60%60&key=124252"
-\`\`\`
+### Environment Variables
 
-### Проверка
+The PlantUML integration uses two URL configurations:
 
-Отворете http://localhost:8080/post/plantuml-demo за да видите рендерираната диаграма!
+- `PLANTUML_SERVER` - Internal server URL for processing (default: `http://plantuml:8080`)
+- `PLANTUML_PUBLIC_URL` - Public URL for browser to fetch images (default: `/plantuml`)
 
-## Технически детайли
+These are set in `docker-compose.yml`:
 
-### Архитектура
+```yaml
+services:
+  web:
+    environment:
+      PLANTUML_SERVER: http://plantuml:8080
+      PLANTUML_PUBLIC_URL: /plantuml
+```
 
-1. Markdown съдържа \`\`\`plantuml блок
-2. `plantuml.ProcessPlantUMLSimple()` намира всички PlantUML блокове
-3. PlantUML кодът се енкодва в base64
-4. Генерира се URL към PlantUML сървъра: `http://plantuml:8080/png/{encoded}`
-5. Блокът се заменя с Markdown синтаксис за изображение: `![PlantUML Diagram](url)`
-6. Blackfriday конвертира целия Markdown в HTML
-7. HTML се показва в браузъра с рендерираните диаграми
+### Docker Compose Setup
 
-### Файлова структура
+The PlantUML server runs in its own container:
 
-\`\`\`
-go-markdown-server/
-├── docker-compose.yml      # Добавен PlantUML контейнер
-├── plantuml/
-│   └── plantuml.go         # PlantUML обработка
-├── routes.go               # Интегрирана PlantUML обработка
-├── main.go
-├── db/
-│   └── datebase.go
-└── PLANTUML_USAGE.md       # Тази документация
-\`\`\`
+```yaml
+plantuml:
+  container_name: plantuml
+  image: plantuml/plantuml-server:jetty
+  ports:
+    - "8081:8080"
+```
+
+Access it directly at: http://localhost:8081
+
+## Diagram Types Supported
+
+PlantUML supports many diagram types:
+
+- **Sequence diagrams** - Show interactions between objects
+- **Use case diagrams** - Display system functionality
+- **Class diagrams** - Show object-oriented structure
+- **Activity diagrams** - Describe workflows
+- **Component diagrams** - Show system architecture
+- **State diagrams** - Represent state machines
+- **Object diagrams** - Show object instances
+- **Deployment diagrams** - Display hardware/software
+- **Timing diagrams** - Show time-based interactions
+- **Network diagrams** - Illustrate network topology
+- **Wireframes** - UI mockups (Salt)
+- **Archimate diagrams** - Enterprise architecture
+- **Gantt charts** - Project scheduling
+- **MindMaps** - Hierarchical information
+- **WBS diagrams** - Work breakdown structure
+- **JSON/YAML visualization** - Data structure diagrams
+
+## Advanced Features
+
+### Skinparam Customization
+
+The PlantUML module automatically injects default styling to match document fonts:
+
+```go
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+```
+
+You can override these in your diagrams:
+
+```plantuml
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam handwritten true
+
+Alice -> Bob: Hello with custom style
+@enduml
+```
+
+### Link Normalization
+
+Cross-references in Markdown are automatically normalized:
+- `[link](./file.md)` → `[link](/post/file)`
+- `[link](file.md)` → `[link](/post/file)`
+
+This works for both regular markdown links and links within PlantUML diagrams.
+
+## Testing
+
+Example PlantUML test files are available in:
+- `content/Doc/examples/test-plantuml.md` - Multiple diagram types
+- `content/Doc/examples/test-plantuml-simple.md` - Simple sequence diagram
 
 ## Troubleshooting
 
-### PlantUML сървърът не работи
+### Diagrams not rendering
 
-\`\`\`bash
-# Проверка дали контейнерът работи
-docker ps | grep plantuml
+1. Check PlantUML server is running:
+   ```bash
+   docker ps | grep plantuml
+   ```
 
-# Проверка на логовете
-docker logs plantuml
+2. Check PlantUML server logs:
+   ```bash
+   docker logs plantuml
+   ```
 
-# Рестарт на PlantUML контейнера
-docker-compose restart plantuml
-\`\`\`
+3. Verify environment variables in `docker-compose.yml`
 
-### Диаграмите не се рендерират
+4. Test PlantUML server directly at http://localhost:8081
 
-1. Уверете се, че PlantUML блокът е правилно форматиран
-2. Проверете дали PlantUML сървърът е достъпен: http://localhost:8081
-3. Проверете environment променливата `PLANTUML_SERVER` в docker-compose.yml
+### Syntax errors
 
-## PlantUML референция
+If your diagram doesn't render, check:
+- PlantUML syntax is correct
+- Code block uses \`\`\`plantuml (not \`\`\`puml or other variants)
+- Diagram starts with `@startuml` and ends with `@enduml` (when using full syntax)
 
-Пълна документация: https://plantuml.com/
+### Performance
 
-Поддържани типове диаграми:
-- Sequence diagrams
-- Use case diagrams
-- Class diagrams
-- Activity diagrams
-- Component diagrams
-- State diagrams
-- Object diagrams
-- Deployment diagrams
-- Timing diagrams
-- И много други...
+Large or complex diagrams may take longer to render. The PlantUML server processes them on-demand. Consider:
+- Simplifying overly complex diagrams
+- Breaking large diagrams into smaller components
+- Using caching (future feature)
+
+## More Information
+
+- [PlantUML Official Documentation](https://plantuml.com/)
+- [PlantUML Language Reference](https://plantuml.com/guide)
+- [PlantUML Server Docker Image](https://hub.docker.com/r/plantuml/plantuml-server)

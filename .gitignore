@@ -31,3 +31,8 @@ go.work
 *.swo
 *~
 /Architecture
+
+# Host-mounted directories (Docker volumes)
+data/
+backups/
+content/

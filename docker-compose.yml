@@ -26,6 +26,8 @@ services:
     image: mongo
     ports: 
       - "27017:27017"
+    volumes:
+      - ./data/mongodb:/data/db
   plantuml:
     container_name: plantuml
     image: plantuml/plantuml-server:jetty

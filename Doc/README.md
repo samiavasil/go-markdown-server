@@ -136,3 +136,9 @@ Volumes:
 - Keep `md.html` consistent with API field names (lowercase: `title`, `body`, `url`).
 - Ensure PlantUML server is reachable; diagrams use `PLANTUML_PUBLIC_URL` in rendered pages.
 - Validate MongoDB connectivity before enabling sync operations.
+
+## Examples
+
+See example PlantUML diagrams and test files:
+- [Simple PlantUML Example](/post/test-plantuml-simple) - Basic sequence diagram
+- [Advanced PlantUML Examples](/post/test-plantuml) - Multiple diagram types (sequence, class, component, activity)

@@ -18,7 +18,7 @@ if [ -z "$COLLECTION_NAME" ]; then
 fi
 
 echo "======================================"
-echo "📥 IMPORTING MARKDOWN FILES"
+echo "IMPORTING MARKDOWN FILES"
 echo "======================================"
 echo "Source directory: $MD_DIR"
 echo "Collection name: $COLLECTION_NAME"
@@ -50,7 +50,7 @@ response=$(eval $curl_cmd)
 if echo "$response" | grep -q "\"status\":\"success\""; then
     echo ""
     echo "======================================"
-    echo "✅ IMPORT COMPLETE!"
+    echo "IMPORT COMPLETE!"
     echo "======================================"
     echo "Collection: $COLLECTION_NAME"
     echo "Files imported: $file_count"
@@ -59,7 +59,7 @@ if echo "$response" | grep -q "\"status\":\"success\""; then
 else
     echo ""
     echo "======================================"
-    echo "❌ IMPORT FAILED"
+    echo "IMPORT FAILED"
     echo "======================================"
     echo "Response: $response"
     exit 1
