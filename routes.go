@@ -186,6 +186,9 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte("success"))
+	
+	// Notify connected clients to reload
+	broadcastChange("reload")
 }
 
 // createCollectionHandler creates a new collection and optionally uploads files
@@ -265,6 +268,9 @@ func createCollectionHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"status": "success", "collection": collectionName})
 	log.Printf("=== Collection '%s' created successfully ===", collectionName)
+	
+	// Notify connected clients to reload
+	broadcastChange("reload")
 }
 
 // deleteCollectionHandler deletes a collection and all its posts
@@ -287,6 +293,9 @@ func deleteCollectionHandler(w http.ResponseWriter, r *http.Request) {
 	
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"status": "success"})
+	
+	// Notify connected clients to reload
+	broadcastChange("reload")
 }
 
 // uploadFilesHandler uploads markdown files to an existing collection
@@ -330,6 +339,9 @@ func uploadFilesHandler(w http.ResponseWriter, r *http.Request) {
 		"status": "success",
 		"count":  uploadedCount,
 	})
+	
+	// Notify connected clients to reload
+	broadcastChange("reload")
 }
 
 // processUploadedFileToCollection processes file and puts it in specified collection
@@ -437,5 +449,8 @@ func syncDirectoryHandler(w http.ResponseWriter, r *http.Request) {
 		"status":  "success",
 		"message": "Files synced successfully from content/",
 	})
+	
+	// Notify connected clients to reload
+	broadcastChange("reload")
 }
 
