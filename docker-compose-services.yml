@@ -1,0 +1,12 @@
+version: '3'
+services:
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports: 
+      - "27017:27017"
+  plantuml:
+    container_name: plantuml
+    image: plantuml/plantuml-server:jetty
+    ports:
+      - "8081:8080"

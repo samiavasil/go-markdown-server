@@ -1,0 +1,29 @@
+@startuml services-architecture
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam ArrowFontSize 10
+skinparam NoteFontSize 10
+skinparam ComponentFontSize 11
+
+actor Browser as browser
+component "Go Markdown Server" as web
+database "MongoDB" as mongo
+component "PlantUML Server\n(plantuml/plantuml-server:jetty)" as plantuml
+
+browser --> web : HTTP (/:, /post/{}, /collections, /collection/{}, /api/*)
+web --> mongo : MongoDB Driver (CRUD on blog.posts)
+web --> plantuml : HTTP (encode + render PNG)
+
+note right of web
+- Routes: index, post, collections, collection
+- APIs: /api/collection/*, /api/sync
+- Markdown render: Blackfriday
+- PlantUML processing: code fences & .puml files
+end note
+
+note bottom of plantuml
+- Public URL: ${PLANTUML_PUBLIC_URL}
+- Internal URL: ${PLANTUML_SERVER}
+end note
+
+@enduml

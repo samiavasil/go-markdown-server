@@ -1,0 +1,38 @@
+# Corporate CA certificates - DO NOT COMMIT
+certs/
+
+# Build artifacts
+goapp
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# Environment files
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+/Architecture
+
+# Host-mounted directories (Docker volumes)
+data/
+backups/
+content/

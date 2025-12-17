@@ -4,79 +4,1267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Markdown Server</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inconsolata&family=Montserrat:wght@400;800&display=swap"
-        rel="stylesheet">
     <style>
-        .side {
-    background-color:rgb(44, 53, 189);
-    position: fixed;
-    min-height: 100%;
-    width: 20rem;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    font-family: 'Inconsolata', monospace;
-    color: #fff;
-    font-weight: 500;
-    padding: 1.5rem;
-    padding-top: 10rem;
-}
-.menu {
-    list-style: none;
-}
-.menu-item a {
-    color: #fff;
-    font-size: 25px;
-}
-.content {
-    max-width: 45rem;
-    margin-left: 28rem;
-    margin-top: 6rem;
-    font-family: 'Montserrat', sans-serif;
-    font-size: large;
-}
-h1 {
-    font-size: 60px;
-    font-weight: 800;
-}
-code {
-    background-color: rgb(221, 221, 221);
-    padding: 1rem;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-@media screen and (max-width: 600px) {
-    .side {
-        width: 100%;
-        padding: 0.5rem;
-        min-height: 0;
-        position: relative;
-    }
-    .side > h1 {
-        text-align: center;
-    }
-    .content {
-        padding: 0.2rem;
-        margin: 6rem 0;
-    }
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
 
+        .top-nav {
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            height: 50px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .top-nav button {
+            background-color: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .top-nav button:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .top-nav .search-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 20px;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .top-nav .search-input {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .top-nav .search-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .top-nav .search-input:focus {
+            background-color: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .top-nav .search-filter {
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .top-nav .search-filter:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .top-nav .search-filter option {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .top-nav .title {
+            margin-left: auto;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .top-nav .search-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 20px;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .top-nav .search-input {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .top-nav .search-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .top-nav .search-input:focus {
+            background-color: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .top-nav .search-filter {
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .top-nav .search-filter:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .top-nav .search-filter option {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            max-height: 60vh;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .search-result-collection {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+        }
+
+        .search-result-snippet {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .search-result-snippet mark {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        .search-no-results {
+            padding: 20px;
+            text-align: center;
+            color: #7f8c8d;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            max-height: 60vh;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .search-result-collection {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+        }
+
+        .search-result-snippet {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .search-result-snippet mark {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        .search-no-results {
+            padding: 20px;
+            text-align: center;
+            color: #7f8c8d;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #34495e;
+            color: #ecf0f1;
+            overflow-y: auto;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h3 {
+            padding: 20px;
+            background-color: #2c3e50;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-actions {
+            padding: 10px 15px;
+            background-color: #2c3e50;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 5px;
+        }
+
+        .sidebar-actions button {
+            flex: 1;
+            background-color: #3498db;
+            border: none;
+            color: white;
+            padding: 8px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .sidebar-actions button:hover {
+            background-color: #2980b9;
+        }
+
+        .sidebar-actions button.danger {
+            background-color: #e74c3c;
+        }
+
+        .sidebar-actions button.danger:hover {
+            background-color: #c0392b;
+        }
+
+        .sidebar-actions button:disabled {
+            background-color: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar li {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background-color 0.2s;
+        }
+
+        .sidebar li:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .sidebar li.active {
+            background-color: #3498db;
+            font-weight: 500;
+        }
+
+        .content {
+            flex: 1;
+            background-color: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .content h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .content h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .content h3 {
+            color: #34495e;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+
+        .content p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .content ul, .content ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .content a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        .content code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: "Courier New", monospace;
+            font-size: 0.9em;
+        }
+
+        .content pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+
+        .content pre code {
+            background-color: transparent;
+            padding: 0;
+            color: #ecf0f1;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .content table th,
+        .content table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .content table th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .content table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .content blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #555;
+            font-style: italic;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-body label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .modal-body input[type="text"],
+        .modal-body input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-footer button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .modal-footer button.primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .modal-footer button.primary:hover {
+            background-color: #2980b9;
+        }
+
+        .modal-footer button.secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .modal-footer button.secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .file-upload-info {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
-    <div class="side">
-        <h3><strong>ls</strong> -a /life | <strong>grep</strong> fun</h3>
-        <ul class="menu">
-            <li class="menu-item"><a href="/"><strong>cd</strong> home</a></li>
-            <li class="menu-item"><a href="/post/about"><strong>cd</strong> about</a></li>
-            <li class="menu-item"><a href="https://github.com/beldmian" target="_blank"><strong>cd</strong> github</a></li>
-        </ul>    
+    <div class="top-nav">
+        <button onclick="history.back()">← Back</button>
+        <button onclick="location.href='/'">🏠 Home</button>
+        <button onclick="history.forward()">Forward →</button>
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search documentation..." />
+            <select class="search-filter" id="searchFilter">
+                <option value="all">All Collections</option>
+            </select>
+        </div>
+        <span class="title">Go Markdown Server</span>
     </div>
-    <div class="content">        
-        {{.}}
+    <div class="search-results" id="searchResults"></div>    <div class="container">
+        <div class="sidebar">
+            <h3>Collections</h3>
+            <div class="sidebar-actions">
+                <button onclick="showCreateModal()">New</button>
+                <button id="editBtn" onclick="showEditModal()" disabled>Edit</button>
+                <button id="deleteBtn" onclick="deleteCollection()" class="danger" disabled>Delete</button>
+                <button onclick="syncContent()" title="Sync files from content directory">Sync</button>
+            </div>
+            <ul id="collections-list">
+                <li>Loading...</li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <iframe id="contentFrame" src="/content/Architecture"></iframe>
+        </div>
     </div>
+
+    <!-- Create Collection Modal -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Collection</h2>
+            </div>
+            <div class="modal-body">
+                <label for="newCollectionName">Collection Name (optional):</label>
+                <input type="text" id="newCollectionName" placeholder="Leave empty to use folder name">
+                
+                <label for="newCollectionFiles">Select Folder with Markdown Files:</label>
+                <input type="file" id="newCollectionFiles" multiple webkitdirectory directory>
+                <div class="file-upload-info">Click "Choose Files" and select a folder. All .md files will be imported recursively. The folder name will be used as the collection name if you don't provide one above.</div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary" onclick="closeCreateModal()">Cancel</button>
+                <button class="primary" onclick="createCollection()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Collection Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Collection: <span id="editCollectionName"></span></h2>
+            </div>
+            <div class="modal-body">
+                <label for="editCollectionFiles">Select Folder with Markdown Files:</label>
+                <input type="file" id="editCollectionFiles" multiple webkitdirectory directory>
+                
+                <label>
+                    <input type="checkbox" id="replaceExisting">
+                    Replace existing files (delete all current posts first)
+                </label>
+                <div class="file-upload-info">Select a folder to upload all .md files from it to this collection.</div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary" onclick="closeEditModal()">Cancel</button>
+                <button class="primary" onclick="uploadFiles()">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedCollection = null;
+
+        async function loadCollections() {
+            console.log('DEBUG: loadCollections() called');
+            try {
+                const response = await fetch('/collections', {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                const collections = await response.json();
+                console.log('DEBUG: Fetched collections:', collections);
+                
+                const list = document.getElementById('collections-list');
+                list.innerHTML = '';
+                
+                if (collections.length === 0) {
+                    list.innerHTML = '<li style="color: #95a5a6;">No collections</li>';
+                    selectedCollection = null;
+                    document.getElementById('editBtn').disabled = true;
+                    document.getElementById('deleteBtn').disabled = true;
+                    console.log('DEBUG: No collections found');
+                    return;
+                }
+                
+                // Extract collection names from objects
+                const collectionNames = collections.map(c => c.name || c);
+                
+                // Проверка дали текущата селекция все още съществува
+                let collectionToSelect = selectedCollection;
+                console.log('DEBUG: Current selection:', selectedCollection);
+                if (!selectedCollection || !collectionNames.includes(selectedCollection)) {
+                    // Ако няма селекция или изтритата колекция е била селектирана -> избери първата
+                    collectionToSelect = collectionNames[0];
+                    console.log('DEBUG: Selection changed to:', collectionToSelect);
+                }
+                
+                collections.forEach(collection => {
+                    const li = document.createElement('li');
+                    const collectionName = collection.name || collection; // Support both old and new format
+                    const isAutoSync = collection.autoSync || false;
+                    
+                    // Add 🔄 icon for auto-sync collections from content/ directory
+                    li.textContent = isAutoSync ? `🔄 ${collectionName}` : collectionName;
+                    
+                    if (collectionName === collectionToSelect) {
+                        li.classList.add('active');
+                    }
+                    li.onclick = () => {
+                        selectCollection(collectionName);
+                        loadCollectionInFrame(collectionName);
+                    };
+                    list.appendChild(li);
+                });
+                
+                // Задай селекцията и зареди в iframe
+                selectCollection(collectionToSelect);
+                loadCollectionInFrame(collectionToSelect);
+                console.log('DEBUG: Collections loaded successfully');
+                
+            } catch (error) {
+                console.error('Failed to load collections:', error);
+                document.getElementById('collections-list').innerHTML = 
+                    '<li style="color: #e74c3c;">Error loading</li>';
+            }
+        }
+        
+        function loadCollectionInFrame(collection) {
+            const iframe = document.getElementById('contentFrame');
+            iframe.src = '/content/' + encodeURIComponent(collection);
+        }
+
+        function selectCollection(collectionName) {
+            selectedCollection = collectionName;
+            document.getElementById('editBtn').disabled = false;
+            document.getElementById('deleteBtn').disabled = false;
+            
+            // Маркирай визуално активната колекция
+            const items = document.querySelectorAll('.sidebar li');
+            items.forEach(item => {
+                if (item.textContent === collectionName) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // Modal functions
+        function showCreateModal() {
+            document.getElementById('createModal').style.display = 'block';
+            document.getElementById('newCollectionName').value = '';
+            document.getElementById('newCollectionFiles').value = '';
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').style.display = 'none';
+            document.getElementById('newCollectionName').value = '';
+            document.getElementById('newCollectionFiles').value = '';
+        }
+        
+        // Auto-fill collection name when folder is selected
+        document.addEventListener('DOMContentLoaded', () => {
+            const filesInput = document.getElementById('newCollectionFiles');
+            const nameInput = document.getElementById('newCollectionName');
+            
+            if (filesInput) {
+                filesInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0 && !nameInput.value) {
+                        const firstFile = e.target.files[0];
+                        if (firstFile.webkitRelativePath) {
+                            const parts = firstFile.webkitRelativePath.split('/');
+                            if (parts.length > 1) {
+                                nameInput.value = parts[0];
+                                nameInput.placeholder = 'Folder name: ' + parts[0];
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        function showEditModal() {
+            if (!selectedCollection) {
+                alert('Please select a collection first');
+                return;
+            }
+            document.getElementById('editCollectionName').textContent = selectedCollection;
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('editCollectionFiles').value = '';
+            document.getElementById('replaceExisting').checked = false;
+        }
+
+        async function createCollection() {
+            const name = document.getElementById('newCollectionName').value.trim();
+            const filesInput = document.getElementById('newCollectionFiles');
+            
+            if (filesInput.files.length === 0) {
+                alert('Please select a folder with markdown files');
+                return;
+            }
+
+            // Extract folder name from webkitRelativePath of first file
+            let collectionName = name;
+            if (!collectionName) {
+                const firstFile = filesInput.files[0];
+                if (firstFile.webkitRelativePath) {
+                    const parts = firstFile.webkitRelativePath.split('/');
+                    if (parts.length > 1) {
+                        collectionName = parts[0];
+                    }
+                } else {
+                    collectionName = prompt('Enter collection name:');
+                    if (!collectionName) return;
+                }
+            }
+
+            const formData = new FormData();
+            formData.append('name', collectionName);
+            
+            // Add all files with their relative paths
+            for (let i = 0; i < filesInput.files.length; i++) {
+                const file = filesInput.files[i];
+                // Use webkitRelativePath to preserve folder structure info
+                formData.append('files', file, file.webkitRelativePath || file.name);
+            }
+
+            try {
+                const response = await fetch('/api/collection/create', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    alert('Error: ' + error);
+                    return;
+                }
+
+                const result = await response.json();
+                alert('Collection "' + result.collection + '" created successfully!');
+                closeCreateModal();
+                
+                // Reload collections and navigate to new one
+                await loadCollections();
+                selectCollection(result.collection);
+                loadCollectionInFrame(result.collection);
+            } catch (error) {
+                console.error('Error creating collection:', error);
+                alert('Failed to create collection: ' + error.message);
+            }
+        }
+
+        async function uploadFiles() {
+            if (!selectedCollection) {
+                alert('No collection selected');
+                return;
+            }
+
+            const filesInput = document.getElementById('editCollectionFiles');
+            if (filesInput.files.length === 0) {
+                alert('Please select a folder with files to upload');
+                return;
+            }
+
+            const replace = document.getElementById('replaceExisting').checked;
+            
+            if (replace && !confirm('This will delete all existing posts in "' + selectedCollection + '". Continue?')) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('replace', replace);
+            
+            for (let i = 0; i < filesInput.files.length; i++) {
+                const file = filesInput.files[i];
+                formData.append('files', file, file.webkitRelativePath || file.name);
+            }
+
+            try {
+                const response = await fetch('/api/collection/' + encodeURIComponent(selectedCollection) + '/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    alert('Error: ' + error);
+                    return;
+                }
+
+                const result = await response.json();
+                alert(result.count + ' file(s) uploaded successfully!');
+                closeEditModal();
+                
+                // Reload the page to show updated content
+                window.location.reload();
+            } catch (error) {
+                console.error('Error uploading files:', error);
+                alert('Failed to upload files: ' + error.message);
+            }
+        }
+
+        async function deleteCollection() {
+            if (!selectedCollection) {
+                alert('Please select a collection first');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete the collection "' + selectedCollection + '" and all its posts?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/collection/' + encodeURIComponent(selectedCollection) + '/delete', {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    alert('Error: ' + error);
+                    return;
+                }
+
+                alert('Collection "' + selectedCollection + '" deleted successfully!');
+                selectedCollection = null;
+                document.getElementById('editBtn').disabled = true;
+                document.getElementById('deleteBtn').disabled = true;
+                loadCollections();
+                
+                // Navigate to home
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Error deleting collection:', error);
+                alert('Failed to delete collection: ' + error.message);
+            }
+        }
+
+        async function syncContent() {
+            if (!confirm('Sync all markdown files from the content directory?\n\nThis will import any new files found in ./content/')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/sync', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error);
+                }
+
+                const result = await response.json();
+                alert('Sync completed successfully!\n\nDirectory: ' + result.directory);
+                
+                // Reload collections to show new content
+                await loadCollections();
+                window.location.reload();
+            } catch (error) {
+                console.error('Error syncing content:', error);
+                alert('Failed to sync content: ' + error.message);
+            }
+        }
+
+        async function syncDirectory() {
+            if (!confirm('Sync markdown files from directory?\n\nThis will scan the configured directory and import all .md files.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/sync', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    alert('Sync failed: ' + error);
+                    return;
+                }
+
+                const result = await response.json();
+                alert('Sync complete!\nDirectory: ' + result.directory);
+                
+                // Reload collections
+                loadCollections();
+                window.location.reload();
+            } catch (error) {
+                console.error('Error syncing:', error);
+                alert('Sync failed: ' + error.message);
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const createModal = document.getElementById('createModal');
+            const editModal = document.getElementById('editModal');
+            if (event.target === createModal) {
+                closeCreateModal();
+            } else if (event.target === editModal) {
+                closeEditModal();
+            }
+        }
+
+        let searchTimeout = null;
+        let allPosts = [];
+
+        async function loadAllPosts() {
+            try {
+                const response = await fetch('/collections');
+                const collections = await response.json();
+                allPosts = [];
+                
+                for (const collection of collections) {
+                    const collectionName = collection.name || collection;
+                    const postsResponse = await fetch(`/api/collection/${encodeURIComponent(collectionName)}`);
+                    const posts = await postsResponse.json();
+                    posts.forEach(post => {
+                        allPosts.push({
+                            ...post,
+                            collection: collectionName
+                        });
+                    });
+                }
+                
+                // Populate search filter dropdown
+                const searchFilter = document.getElementById('searchFilter');
+                searchFilter.innerHTML = '<option value="all">All Collections</option>';
+                collections.forEach(collection => {
+                    const option = document.createElement('option');
+                    const collectionName = collection.name || collection;
+                    const isAutoSync = collection.autoSync || false;
+                    
+                    option.value = collectionName;
+                    option.textContent = isAutoSync ? `🔄 ${collectionName}` : collectionName;
+                    searchFilter.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading posts:', error);
+            }
+        }
+
+        function performSearch(query, filter) {
+            if (!query || query.length < 2) {
+                document.getElementById('searchResults').classList.remove('active');
+                return;
+            }
+
+            const lowerQuery = query.toLowerCase();
+            const results = allPosts.filter(post => {
+                // Filter by collection if not "all"
+                if (filter !== 'all' && post.collection !== filter) {
+                    return false;
+                }
+                
+                // Search in title and body
+                const titleMatch = post.title.toLowerCase().includes(lowerQuery);
+                const bodyMatch = post.body.toLowerCase().includes(lowerQuery);
+                
+                return titleMatch || bodyMatch;
+            }).slice(0, 10); // Limit to 10 results
+
+            displaySearchResults(results, lowerQuery);
+        }
+
+        function displaySearchResults(results, query) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="search-no-results">No results found</div>';
+                searchResults.classList.add('active');
+                return;
+            }
+
+            searchResults.innerHTML = results.map(post => {
+                // Extract snippet with context around match
+                const bodyText = post.body.replace(/<[^>]*>/g, '').substring(0, 500);
+                const queryIndex = bodyText.toLowerCase().indexOf(query);
+                let snippet = bodyText;
+                
+                if (queryIndex > -1) {
+                    const start = Math.max(0, queryIndex - 50);
+                    const end = Math.min(bodyText.length, queryIndex + query.length + 100);
+                    snippet = (start > 0 ? '...' : '') + bodyText.substring(start, end) + (end < bodyText.length ? '...' : '');
+                    
+                    // Highlight query in snippet
+                    const regex = new RegExp(`(${query})`, 'gi');
+                    snippet = snippet.replace(regex, '<mark>$1</mark>');
+                } else {
+                    snippet = bodyText.substring(0, 150) + '...';
+                }
+
+                return `
+                    <div class="search-result-item" onclick="navigateToPost('${post.url}', '${post.collection}', '${query}')">
+                        <div class="search-result-title">${post.title}</div>
+                        <div class="search-result-collection">Collection: ${post.collection}</div>
+                        <div class="search-result-snippet">${snippet}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            searchResults.classList.add('active');
+        }
+
+        function navigateToPost(url, collection, query) {
+            // Select the collection
+            if (collection) {
+                selectCollection(collection);
+            }
+            
+            // Load post in iframe with search query for highlighting
+            const iframe = document.getElementById('contentFrame');
+            iframe.src = '/post/' + encodeURIComponent(url) + (query ? '?highlight=' + encodeURIComponent(query) : '');
+            
+            // Close search results
+            document.getElementById('searchResults').classList.remove('active');
+            document.getElementById('searchInput').value = '';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCollections();
+            loadAllPosts();
+            
+            // Search input handler
+            const searchInput = document.getElementById('searchInput');
+            const searchFilter = document.getElementById('searchFilter');
+            
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(e.target.value, searchFilter.value);
+                }, 300);
+            });
+            
+            searchFilter.addEventListener('change', () => {
+                performSearch(searchInput.value, searchFilter.value);
+            });
+            
+            // Close search results only when clicking outside or pressing Escape
+            document.addEventListener('click', (e) => {
+                const searchResults = document.getElementById('searchResults');
+                const searchContainer = document.querySelector('.search-container');
+                
+                // Don't close if clicking inside search results or search container
+                if (!searchContainer.contains(e.target) && 
+                    !searchResults.contains(e.target)) {
+                    searchResults.classList.remove('active');
+                }
+            });
+            
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('searchResults').classList.remove('active');
+                }
+            });
+            
+            // Handle anchor links for smooth scrolling to headings
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                // Check if clicked element is a link with hash
+                if (target.tagName === 'A' && target.hash) {
+                    const href = target.getAttribute('href');
+                    // Only handle internal anchor links (starting with #)
+                    if (href && href.startsWith('#')) {
+                        e.preventDefault();
+                        const targetId = href.substring(1);
+                        
+                        // Try to find element by exact ID
+                        let element = document.getElementById(targetId);
+                        
+                        // If not found, try to find heading with matching text
+                        if (!element) {
+                            const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                            const targetText = targetId.toLowerCase().replace(/-/g, ' ').replace(/_/g, ' ');
+                            
+                            for (const heading of headings) {
+                                const headingText = heading.textContent.toLowerCase().trim();
+                                // Match if heading text contains target or vice versa
+                                if (headingText.includes(targetText) || targetText.includes(headingText)) {
+                                    element = heading;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // Scroll to element if found
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            // Update URL without triggering page reload
+                            history.pushState(null, null, href);
+                        }
+                    }
+                }
+            });
+        });
+
+        // Auto-refresh via Server-Sent Events
+        console.log('Initializing SSE connection to /api/events...');
+        const eventSource = new EventSource('/api/events');
+        
+        eventSource.onopen = function(event) {
+            console.log('SSE connection opened successfully!');
+        };
+        
+        eventSource.onmessage = function(event) {
+            console.log('SSE event received:', event.data);
+            if (event.data === 'reload') {
+                console.log('Content changed, reloading collections and content...');
+                // Reload collections (ще презареди списъка, запази/избере селекция и обнови iframe)
+                loadCollections();
+            }
+        };
+        
+        eventSource.onerror = function(error) {
+            console.error('SSE connection error:', error);
+            console.log('SSE readyState:', eventSource.readyState);
+            console.log('Will retry automatically...');
+        };
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            console.log('Page unloading, closing SSE connection');
+            eventSource.close();
+        });
+    </script>
 </body>
 </html>
 {{end}}

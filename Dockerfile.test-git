@@ -1,0 +1,19 @@
+FROM golang:1.21-alpine
+
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+
+ENV HTTP_PROXY=${HTTP_PROXY}
+ENV HTTPS_PROXY=${HTTPS_PROXY}
+
+RUN apk add --no-cache git curl
+
+RUN git config --global http.proxy ${HTTP_PROXY} && \
+    git config --global https.proxy ${HTTPS_PROXY} && \
+    git config --global http.sslVerify false
+
+RUN echo "=== Testing curl with proxy ===" && \
+    curl -I -x ${HTTP_PROXY} https://github.com 2>&1 | head -10
+
+RUN echo "=== Testing git ls-remote ===" && \
+    git ls-remote https://github.com/gorilla/mux.git HEAD
